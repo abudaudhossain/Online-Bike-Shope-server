@@ -22,7 +22,8 @@ async function run() {
 
         const database = client.db("online-bike-shop");
         const productsCollection = database.collection('products');
-        const usersCollection = database.collection('users')
+        const usersCollection = database.collection('users');
+        const orderCollection = database.collection('orders')
 
         //post offer api
 
@@ -38,7 +39,7 @@ async function run() {
             const result = await cursor.toArray();
             res.send(result);
         })
-        //get api one offer by id
+        //get api one Product by id
         app.get('/product/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
@@ -58,16 +59,14 @@ async function run() {
         app.post('/addUser', async (req, res) => {
             const user = req.body
             const result = await usersCollection.insertOne(user);
-            res.json(result);
+            res.send(result);
         })
 
          //Order api 
-         app.post('/order', async (req, res) => {
-            booking = req.body;
-
-            const result = await bookingCollection.insertOne(booking);
-
-            res.json(result)
+         app.post('/addOrder', async (req, res) => {
+            const order = req.body;
+            const result = await orderCollection.insertOne(order);
+            res.send(result)
         })
       
 
