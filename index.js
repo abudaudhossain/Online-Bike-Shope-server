@@ -23,7 +23,8 @@ async function run() {
         const database = client.db("online-bike-shop");
         const productsCollection = database.collection('products');
         const usersCollection = database.collection('users');
-        const orderCollection = database.collection('orders')
+        const orderCollection = database.collection('orders');
+        const reviewCollection = database.collection('review');;
 
         //post addProduct api
 
@@ -61,7 +62,18 @@ async function run() {
             const result = await usersCollection.insertOne(user);
             res.send(result);
         })
-
+        //post review api 
+        app.post('/addReview', async (req, res) => {
+            const review = req.body
+            const result = await reviewCollection.insertOne(review);
+            res.send(result);
+        })
+        //get all review api
+        app.get('/reviews', async (req, res) => {
+            const cursor = reviewCollection.find({});
+            const result = await cursor.toArray();
+            res.send(result);
+        })
         //Order api 
         app.post('/addOrder', async (req, res) => {
             const order = req.body;
@@ -73,10 +85,65 @@ async function run() {
             const email = req.body;
             // const query = {};
             const result = await orderCollection.find(email).toArray();
-
-
             res.send(result)
         })
+        //get user list for user api
+        app.post('/user', async (req, res) => {
+            const email = req.body;
+            // const query = {};
+            const result = await usersCollection.findOne(email);
+            res.json(result)
+        })
+        //get all user
+        app.get('/allUsers', async (req, res) => {
+            const result = await usersCollection.find({}).toArray();
+            res.send(result)
+        })
+
+         //delete my order api
+         app.delete('/deleteOrder/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await orderCollection.deleteOne(query);
+
+            res.json(result)
+        })
+        //get all order list api
+        app.get('/allOrder', async (req, res) => {
+            const result = await orderCollection.find({}).toArray();
+            res.send(result)
+        })
+        //update states api
+        app.put('/updateStates/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: {
+                    states: `Shipped`
+                },
+            };
+            const result = await orderCollection.updateOne(query, updateDoc, options);
+            // console.log(query);
+
+            res.json(result);
+        })
+        //update admin states api
+        app.put('/updateAdmin/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: {
+                    admin: `yes`
+                },
+            };
+            const result = await usersCollection.updateOne(query, updateDoc, options);
+            // console.log(query);
+
+            res.json(result);
+        })
+
 
     } finally {
         // await client.close();
