@@ -25,7 +25,7 @@ async function run() {
         const usersCollection = database.collection('users');
         const orderCollection = database.collection('orders')
 
-        //post offer api
+        //post addProduct api
 
         app.post('/addProduct', async (req, res) => {
             const product = req.body
@@ -33,7 +33,7 @@ async function run() {
             res.json(result);
         })
 
-        // get all offers api 
+        // get all products api 
         app.get('/products', async (req, res) => {
             const cursor = productsCollection.find({});
             const result = await cursor.toArray();
@@ -48,7 +48,7 @@ async function run() {
             res.send(result);
 
         })
-        // get all offers api 
+        // get all user api 
         app.get('/users', async (req, res) => {
             const cursor = usersCollection.find({});
             const result = await cursor.toArray();
@@ -62,13 +62,21 @@ async function run() {
             res.send(result);
         })
 
-         //Order api 
-         app.post('/addOrder', async (req, res) => {
+        //Order api 
+        app.post('/addOrder', async (req, res) => {
             const order = req.body;
             const result = await orderCollection.insertOne(order);
             res.send(result)
         })
-      
+        //get order list for user api
+        app.post('/myOrder', async (req, res) => {
+            const email = req.body;
+            // const query = {};
+            const result = await orderCollection.find(email).toArray();
+
+
+            res.send(result)
+        })
 
     } finally {
         // await client.close();
